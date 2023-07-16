@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+spec:
+  selector:
+    matchLabels:
+      app: db
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db-hot
+        image: mysql:latest
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: db_hot
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-hot-persistent-storage
+          mountPath: /var/lib/mysql
+      - name: db-cold-1
+        image: mysql:latest
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: db_cold_1
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-cold-1-persistent-storage
+          mountPath: /var/lib/mysql
+      - name: db-cold-2
+        image: mysql:latest
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: db_cold_2
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-cold-2-persistent-storage
+          mountPath: /var/lib/mysql
+      - name: db-warn-1
+        image: mysql:latest
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: db_warn_1
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-warn-1-persistent-storage
+          mountPath: /var/lib/mysql
+      - name: db-warn-2
+        image: mysql:latest
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: db_warn_2
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-warn-2-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-hot-persistent-storage
+        persistentVolumeClaim:
+          claimName: db-hot-pvc
+      - name: db-cold-1-persistent-storage
+        persistentVolumeClaim:
+          claimName: db-cold-1-pvc
+      - name: db-cold-2-persistent-storage
+        persistentVolumeClaim:
+          claimName: db-cold-2-pvc
+      - name: db-warn-1-persistent-storage
+        persistentVolumeClaim:
+          claimName: db-warn-1-pvc
+      - name: db-warn-2-persistent-storage
+        persistentVolumeClaim:
+          claimName: db-warn-2-pvc
