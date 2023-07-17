@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: egiwork-mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "K3ACkybbmffWZJDK"
+            - name: MYSQL_USER
+              value: "sql_egitech_egiw"
+            - name: MYSQL_PASSWORD
+              value: "K3ACkybbmffWZJDK"
+            - name: MYSQL_DATABASE
+              value: "sql_egitech_egiw"
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: egiwork-mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: egiwork-mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: egiwork-mysql-pvc
